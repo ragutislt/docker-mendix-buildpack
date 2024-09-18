@@ -58,6 +58,7 @@ ENV PYTHONPATH "/opt/mendix/buildpack/lib/:/opt/mendix/buildpack/:/opt/mendix/bu
 
 # Copy start scripts
 COPY scripts/startup.py scripts/vcap_application.json /opt/mendix/build/
+COPY scripts/start_app.sh /opt/mendix/build/
 
 # Create vcap home directory for Datadog configuration
 RUN mkdir -p /home/vcap /opt/datadog-agent/run &&\
@@ -74,6 +75,11 @@ RUN chmod +rx /opt/mendix/build/startup.py &&\
     chmod -R g=u /opt/mendix &&\
     ln -s /opt/mendix/.java /root
 
+RUN chmod +rx /opt/mendix/build/start_app.sh
+
+#COPY scripts/test.py /opt/mendix/build/
+#RUN chmod +rx /opt/mendix/build/test.py
+
 USER ${USER_UID}
 
 # Copy build artifacts from build container
@@ -88,4 +94,6 @@ WORKDIR /opt/mendix/build
 ENV PORT 8080
 EXPOSE $PORT
 
-ENTRYPOINT ["/opt/mendix/build/startup.py"]
+ENTRYPOINT ["/opt/mendix/build/start_app.sh"]
+#ENTRYPOINT ["tail", "-f", "/dev/null"]
+#CMD ["sleep", "infinity"]
